@@ -1,4 +1,4 @@
-# GitHub Enhancer Extension
+# Marrow Chrome Extension
 
 A Chrome extension that enhances GitHub conversation pages (issues and pull requests) with helpful tooltips for various elements.
 
