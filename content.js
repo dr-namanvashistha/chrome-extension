@@ -72,7 +72,6 @@
   function addDiffCoverageTooltips() {
     // 1. Coverage Badge (Image)
     const coverageCleanBadges = document.querySelectorAll('img[alt="Coverage"]');
-    console.log(coverageCleanBadges);
     coverageCleanBadges.forEach(img => {
        if (img.hasAttribute('data-gh-enhancer-tooltip')) return;
        img.setAttribute('data-gh-enhancer-tooltip', 'true');
@@ -197,15 +196,34 @@
     });
   }
 
+  // Debounce function to limit execution frequency
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
   // Initialize tooltips when DOM is ready
   function init() {
     console.log('Extension Loaded');
     try {
       addTooltips();
       
+      // Debounced version of addTooltips for the observer
+      // waits 100ms after the last mutation to run
+      const debouncedAddTooltips = debounce(() => {
+        addTooltips();
+      }, 100);
+
       // Re-add tooltips when DOM changes (for dynamically loaded content)
       const observer = new MutationObserver(() => {
-        addTooltips();
+        debouncedAddTooltips();
       });
       
       observer.observe(document.body, {
