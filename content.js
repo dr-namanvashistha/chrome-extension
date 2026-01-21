@@ -7,61 +7,61 @@
   // Tooltip configuration for different elements
   const tooltipConfig = {
     // Issue/PR author
-    '.timeline-comment-header .author': {
-      tooltip: 'The author of this issue/pull request'
-    },
-    // Labels
-    '.IssueLabel': {
-      tooltip: 'Label to categorize this issue/PR'
-    },
-    // Assignees
-    '.sidebar-assignee': {
-      tooltip: 'Person assigned to work on this issue/PR'
-    },
-    // Reviewers
-    '.sidebar-reviewer': {
-      tooltip: 'Person requested to review this PR'
-    },
-    // Milestone
-    '.sidebar-milestone': {
-      tooltip: 'Milestone associated with this issue/PR'
-    },
-    // Linked issues/PRs
-    '.issue-link': {
-      tooltip: 'Related issue or pull request'
-    },
-    // Comment reactions
-    '.comment-reactions-options': {
-      tooltip: 'Add a reaction to this comment'
-    },
-    // Edit button
-    '.timeline-comment-action': {
-      tooltip: 'Edit or manage this comment'
-    },
-    // Subscribe button
-    '.sidebar-notifications': {
-      tooltip: 'Subscribe to notifications for this issue/PR'
-    },
-    // Lock conversation button
-    '.lock-toggle-link': {
-      tooltip: 'Lock conversation to prevent new comments'
-    },
-    // Code suggestions
-    '.js-comment-update': {
-      tooltip: 'Update or edit this comment'
-    },
-    // Commit references
-    '.commit-link': {
-      tooltip: 'View this commit'
-    },
-    // Status badges
-    '.State': {
-      tooltip: 'Current status of this issue/PR'
-    },
-    // Markdown toolbar buttons
-    '.toolbar-item': {
-      tooltip: 'Markdown formatting option'
-    }
+    // '.timeline-comment-header .author': {
+    //   tooltip: 'The author of this issue/pull request'
+    // },
+    // // Labels
+    // '.IssueLabel': {
+    //   tooltip: 'Label to categorize this issue/PR'
+    // },
+    // // Assignees
+    // '.sidebar-assignee': {
+    //   tooltip: 'Person assigned to work on this issue/PR'
+    // },
+    // // Reviewers
+    // '.sidebar-reviewer': {
+    //   tooltip: 'Person requested to review this PR'
+    // },
+    // // Milestone
+    // '.sidebar-milestone': {
+    //   tooltip: 'Milestone associated with this issue/PR'
+    // },
+    // // Linked issues/PRs
+    // '.issue-link': {
+    //   tooltip: 'Related issue or pull request'
+    // },
+    // // Comment reactions
+    // '.comment-reactions-options': {
+    //   tooltip: 'Add a reaction to this comment'
+    // },
+    // // Edit button
+    // '.timeline-comment-action': {
+    //   tooltip: 'Edit or manage this comment'
+    // },
+    // // Subscribe button
+    // '.sidebar-notifications': {
+    //   tooltip: 'Subscribe to notifications for this issue/PR'
+    // },
+    // // Lock conversation button
+    // '.lock-toggle-link': {
+    //   tooltip: 'Lock conversation to prevent new comments'
+    // },
+    // // Code suggestions
+    // // '.js-comment-update': {
+    // //   tooltip: 'Update or edit this comment'
+    // // },
+    // // Commit references
+    // '.commit-link': {
+    //   tooltip: 'View this commit'
+    // },
+    // // Status badges
+    // '.State': {
+    //   tooltip: 'Current status of this issue/PR'
+    // },
+    // // Markdown toolbar buttons
+    // '.toolbar-item': {
+    //   tooltip: 'Markdown formatting option'
+    // }
   };
 
   // Create tooltip element
@@ -133,7 +133,7 @@
         } else if (selector === '.State') {
           const state = element.textContent.trim();
           tooltipText = `Status: ${state}`;
-        } else if (selector === '.author') {
+        } else if (selector === '.timeline-comment-header .author') {
           const author = element.textContent.trim();
           tooltipText = `Author: ${author}`;
         }
@@ -191,8 +191,10 @@
         // Add tooltip to the header itself
         if (!th.hasAttribute('data-gh-enhancer-tooltip')) {
           th.setAttribute('data-gh-enhancer-tooltip', 'true');
-          th.classList.add('gh-enhancer-has-icon');
-          attachTooltipEvents(th, tooltipText);
+          // Wrap content in span for consistent styling
+          th.innerHTML = '<span class="gh-tooltip-target gh-enhancer-has-icon" data-tip="' + tooltipText + '">' + th.innerHTML + '</span>';
+          const span = th.querySelector('.gh-tooltip-target');
+          attachTooltipEvents(span, tooltipText);
         }
 
         // Add tooltip to the corresponding cell in the body
@@ -204,8 +206,10 @@
           tds.forEach(td => {
              if (!td.hasAttribute('data-gh-enhancer-tooltip')) {
                td.setAttribute('data-gh-enhancer-tooltip', 'true');
-               td.classList.add('gh-enhancer-has-icon');
-               attachTooltipEvents(td, tooltipText);
+               // Wrap content in span for consistent styling
+               td.innerHTML = '<span class="gh-tooltip-target gh-enhancer-has-icon" data-tip="' + tooltipText + '">' + td.innerHTML + '</span>';
+               const span = td.querySelector('.gh-tooltip-target');
+               attachTooltipEvents(span, tooltipText);
              }
           });
         }
@@ -219,8 +223,10 @@
       if (h.textContent.includes('Diff Coverage:')) {
          if (!h.hasAttribute('data-gh-enhancer-tooltip')) {
             h.setAttribute('data-gh-enhancer-tooltip', 'true');
-            h.classList.add('gh-enhancer-has-icon');
-            attachTooltipEvents(h, "Percentage of code covered in this PR");
+            // Wrap content in span for consistent styling
+            h.innerHTML = '<span class="gh-tooltip-target gh-enhancer-has-icon" data-tip="Percentage of code covered in this PR">' + h.innerHTML + '</span>';
+            const span = h.querySelector('.gh-tooltip-target');
+            attachTooltipEvents(span, "Percentage of code covered in this PR");
          }
       }
     });
@@ -274,34 +280,28 @@
         }
       } 
       // Summary items
-      else if (text.startsWith('Total:') && text.includes('lines')) {
-         // Target the number
-         const parts = text.split(':');
-         if (parts.length > 1) {
-            li.setAttribute('data-gh-enhancer-tooltip', 'true');
-            const numPart = parts[1].trim();
-            li.innerHTML = `Total: <span class="gh-tooltip-target gh-enhancer-has-icon" data-tip="Number of changed lines in this PR">${numPart}</span>`;
-            const span = li.querySelector('.gh-tooltip-target');
-            attachTooltipEvents(span, span.getAttribute('data-tip'));
-         }
-      } else if (text.startsWith('Missing:') && text.includes('lines')) {
-         const parts = text.split(':');
-         if (parts.length > 1) {
-            li.setAttribute('data-gh-enhancer-tooltip', 'true');
-            const numPart = parts[1].trim();
-            li.innerHTML = `Missing: <span class="gh-tooltip-target gh-enhancer-has-icon" data-tip="Number of lines with missing coverage">${numPart}</span>`;
-            const span = li.querySelector('.gh-tooltip-target');
-            attachTooltipEvents(span, span.getAttribute('data-tip'));
-         }
-      } else if (text.startsWith('Coverage:') && text.includes('%')) {
-         const parts = text.split(':');
-         if (parts.length > 1) {
-            li.setAttribute('data-gh-enhancer-tooltip', 'true');
-            const numPart = parts[1].trim();
-            li.innerHTML = `Coverage: <span class="gh-tooltip-target gh-enhancer-has-icon" data-tip="same as above diff coverage">${numPart}</span>`;
-            const span = li.querySelector('.gh-tooltip-target');
-            attachTooltipEvents(span, span.getAttribute('data-tip'));
-         }
+      else {
+        const summaryMaps = {
+          'Total': { condition: 'lines', tooltip: 'Number of changed lines in this PR' },
+          'Missing': { condition: 'lines', tooltip: 'Number of lines with missing coverage' },
+          'Coverage': { condition: '%', tooltip: 'same as above diff coverage' }
+        };
+
+        for (const [prefix, config] of Object.entries(summaryMaps)) {
+           // Check if text starts with "Total:", "Missing:", etc.
+           if (text.startsWith(prefix + ':') && text.includes(config.condition)) {
+             const parts = text.split(':');
+             if (parts.length > 1) {
+                li.setAttribute('data-gh-enhancer-tooltip', 'true');
+                const numPart = parts[1].trim();
+                // Safe string construction
+                li.innerHTML = prefix + ': <span class="gh-tooltip-target gh-enhancer-has-icon" data-tip="' + config.tooltip + '">' + numPart + '</span>';
+                const span = li.querySelector('.gh-tooltip-target');
+                attachTooltipEvents(span, span.getAttribute('data-tip'));
+             }
+             break; // Found match
+           }
+        }
       }
     });
 
